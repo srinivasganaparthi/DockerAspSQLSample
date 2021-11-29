@@ -1,0 +1,59 @@
+services:
+  dockeraspsqlsample:
+    build:
+      context: C:\Documents\Learning\DockerAspSQLSample
+      dockerfile: DockerAspSQLSample/Dockerfile
+    depends_on:
+      sql-db-server:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+:443;http://+:80
+      Database: AppDbContext
+      DbPort: "1433"
+      DbServer: sql-db-server
+      DbUser: SA
+      Password: 1Secure*Password1
+    image: dockeraspsqlsample
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      protocol: tcp
+    - mode: ingress
+      target: 80
+      published: 8090
+      protocol: tcp
+    - mode: ingress
+      target: 443
+      protocol: tcp
+    volumes:
+    - type: bind
+      source: C:\Users\sganaparthi\AppData\Roaming/Microsoft/UserSecrets
+      target: /root/.microsoft/usersecrets
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sganaparthi\AppData\Roaming/ASP.NET/Https
+      target: /root/.aspnet/https
+      read_only: true
+      bind:
+        create_host_path: true
+  sql-db-server:
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Express
+      SA_PASSWORD: 1Secure*Password1
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 1433
+      published: 1433
+      protocol: tcp
+networks:
+  default:
+    name: dockercompose2321681513472739802_default

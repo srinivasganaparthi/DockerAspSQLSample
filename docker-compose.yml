@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  sql-db-server:
+     image: "mcr.microsoft.com/mssql/server:2017-latest"
+     environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "1Secure*Password1"
+      MSSQL_PID: Express
+     ports:
+      - "1433:1433"
+  dockeraspsqlsample:
+    image: ${DOCKER_REGISTRY-}dockeraspsqlsample
+    build:
+      context: .
+      dockerfile: DockerAspSQLSample/Dockerfile
+
+    environment:
+      DbServer: "sql-db-server"
+      DbPort: "1433"
+      DbUser: "SA"
+      Password: "1Secure*Password1"
+      Database: "AppDbContext"
+    ports: 
+      - "8090:80"
+
+    depends_on:
+     - sql-db-server
